@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Transactions;
 
 namespace ATM_APP
 {
@@ -43,10 +44,13 @@ namespace ATM_APP
                                 ShowBalance();
                                 break;
                             case "2":
-                                ShowLastTransaction();
+                                currentUser.ShowLastTransaction();
                                 break;
                             case "3":
                                 WithdrawMoney();
+                                break;
+                            default:
+                                Console.WriteLine($"Netesingas pasirinkimas. Bandykite dar karta!");
                                 break;
                         }
                     }
@@ -61,7 +65,7 @@ namespace ATM_APP
                 if (leftTimes > 0)
                 {
                     Console.WriteLine($"Jums liko {leftTimes} kartai!");
-                    Thread.Sleep(2000);
+                    Thread.Sleep(3000);
                 }
                 else
                 {
@@ -128,12 +132,30 @@ namespace ATM_APP
         }
         public static void ShowBalance()
         {
-            Console.WriteLine($"Turimi pinigai: {currentUser.Balance} EUR");            
+            Console.WriteLine($"Turimi pinigai: {currentUser.Balance} EUR");
+            Thread.Sleep(3000);
         }
-        public static void ShowLastTransaction()
-        {
-            Console.WriteLine($"Transaction under construction");            
-        }
+        //public static void ShowLastTransaction()
+        //{
+        //    foreach (var user in users)
+        //    {
+        //        if (user.Transcation.Any())
+        //        {
+        //            Console.WriteLine($"Tranzakcijos kortelei: {user.CardId}");
+        //            foreach (var transacion in user.Transcation)
+        //            {                        
+        //                Console.WriteLine($"Operacija pinigu nusiemimas, Suma: {transacion} EUR");                                              
+        //            }
+        //        }
+        //        else
+        //        {
+        //            Console.WriteLine($"Nerasta jokiu tranzakcju sia kortelei {user.CardId}");
+        //            Thread.Sleep(3000);                    
+        //        }
+        //    }
+        //    //Console.WriteLine($"Nerasta jokiu tranzakcju!");
+        //    Console.ReadLine();
+        //}
         public static void WithdrawMoney()
         {
             Console.WriteLine("Iveskit suma kuria norite isgryninti: ");
@@ -161,6 +183,8 @@ namespace ATM_APP
                 Console.WriteLine($"Bankomatas neisduoda daugiau negu 1000Eur");
             }
             Thread.Sleep(2000);
+
+            currentUser.Transcation.Add(amount);
         }
 
     }
