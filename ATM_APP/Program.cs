@@ -20,13 +20,16 @@ namespace ATM_APP
 
                 string cardId = Console.ReadLine();
 
-                Console.WriteLine("Iveskit PIN: ");
+                Console.WriteLine("Iveskite PIN: ");
                 string pinCode = Console.ReadLine();
 
                 string choise = "";
+                currentUser = new Users();
+                Users loggedInUser = currentUser.Login(cardId, pinCode, users);
 
-                if (Login(cardId, pinCode))
+                if (loggedInUser != null)
                 {                   
+                    currentUser = loggedInUser;
                     while (choise != "4")
                     {
                         Console.Clear();
@@ -41,13 +44,13 @@ namespace ATM_APP
                         switch (choise)
                         {
                             case "1":
-                                ShowBalance();
+                                currentUser.ShowBalance();
                                 break;
                             case "2":
                                 currentUser.ShowLastTransaction();
                                 break;
                             case "3":
-                                WithdrawMoney();
+                                currentUser.WithdrawMoney();
                                 break;
                             default:
                                 Console.WriteLine($"Netesingas pasirinkimas. Bandykite dar karta!");
@@ -89,10 +92,11 @@ namespace ATM_APP
                     string[] userCard = card.Split('|');
 
                     Users user = new Users
-                    {
+                    {                        
                         CardId = userCard[0],
                         PIN = userCard[1],
-                        Balance = double.Parse(userCard[2])
+                        Balance = double.Parse(userCard[2]),
+                        FullName = userCard[3]
                     };
 
                     users.Add(user);
@@ -102,90 +106,20 @@ namespace ATM_APP
             {
                 Console.WriteLine($"Ivyko klaida nuskaitant faila!!");
             }
-        }
-        public static bool Login(string cardId, string pinCode)
-        {
-            Users user = users.FirstOrDefault(currentCard => currentCard.CardId == cardId && currentCard.PIN == pinCode);
-
-            if (user != null)
-            {
-                currentUser = user;
-                return true;
-            }
-            else
-            {
-                Console.WriteLine("Ivesti blogi prisijungimo duomenys");
-            }
-            return false;
-        }
+        }        
         public static void DisplayOption()
-        {
+        {            
             Console.WriteLine("Sveiki prisijunge!!!");
             Console.WriteLine("");
+            Console.WriteLine($"Prisijunges: {currentUser.FullName}");
+            Console.WriteLine($"Balansas: {currentUser.Balance} EUR");
+            Console.WriteLine("");
             Console.WriteLine("Pasirinkite veiksmą:");
-            Console.WriteLine("1. Matyti turimus pinigus");
-            Console.WriteLine("2. Peržiūrėti paskutines transakcijas - kolkas neveikia!");
+            Console.WriteLine("1. Balansas");
+            Console.WriteLine("2. Peržiūrėti paskutines transakcijas");
             Console.WriteLine("3. Pinigų išsiėmimas");
             Console.WriteLine("4. Išeiti");
-            Console.WriteLine("");
-            Console.WriteLine($"Balansas: {currentUser.Balance} EUR");
-        }
-        public static void ShowBalance()
-        {
-            Console.WriteLine($"Turimi pinigai: {currentUser.Balance} EUR");
-            Thread.Sleep(3000);
-        }
-        //public static void ShowLastTransaction()
-        //{
-        //    foreach (var user in users)
-        //    {
-        //        if (user.Transcation.Any())
-        //        {
-        //            Console.WriteLine($"Tranzakcijos kortelei: {user.CardId}");
-        //            foreach (var transacion in user.Transcation)
-        //            {                        
-        //                Console.WriteLine($"Operacija pinigu nusiemimas, Suma: {transacion} EUR");                                              
-        //            }
-        //        }
-        //        else
-        //        {
-        //            Console.WriteLine($"Nerasta jokiu tranzakcju sia kortelei {user.CardId}");
-        //            Thread.Sleep(3000);                    
-        //        }
-        //    }
-        //    //Console.WriteLine($"Nerasta jokiu tranzakcju!");
-        //    Console.ReadLine();
-        //}
-        public static void WithdrawMoney()
-        {
-            Console.WriteLine("Iveskit suma kuria norite isgryninti: ");
-            double amount = Convert.ToDouble(Console.ReadLine());
-
-            if (amount < 0)
-            {
-                Console.WriteLine("Neigiama reiksme negalima");
-                Thread.Sleep(2000);
-                return;
-            }
-
-            if (amount <= 1000 && amount < currentUser.Balance)
-            {
-                Console.WriteLine($"Dabartinis balansas {currentUser.Balance} EUR");
-                currentUser.Balance -= amount;
-                Console.WriteLine($"Jus issiemete {amount} EUR, jusu saskaitoje liko: {currentUser.Balance} EUR");
-            }
-            else if (amount > currentUser.Balance)
-            {
-                Console.WriteLine($"Jums nepakanka lesu issimti norimai sumai, kadangi jusu balansas {currentUser.Balance}");
-            }
-            else
-            {
-                Console.WriteLine($"Bankomatas neisduoda daugiau negu 1000Eur");
-            }
-            Thread.Sleep(2000);
-
-            currentUser.Transcation.Add(amount);
-        }
-
+            Console.WriteLine("");            
+        } 
     }
 }
